@@ -13,7 +13,20 @@ import sys
 import math
 import pygame
 
-def grid(WINDOW):
+class Player:
+    # constructor method for the player
+    def __init__(self):
+        # for now just initialise player position to the centre of the screen
+        self.x = WIDTH/2
+        self.y = HEIGHT/2
+        self.angle = math.pi
+
+    def update(self, keys):
+        if keys[pygame.K_w]:
+            player.y -= 10
+        
+'''
+def grid():
     line_dist = 40
     # using DIV here to get the number of vertical and horizontal lines
     x_lines = WIDTH//line_dist
@@ -28,31 +41,33 @@ def grid(WINDOW):
     for line in range(y_lines):
         y += line_dist
         pygame.draw.line(WINDOW, (255,255,255), (0, y), (WIDTH, y))
-            
+'''            
+
+# global stuff here
+WIDTH = 800
+HEIGHT = 600
+WINDOW = pygame.display.set_mode((WIDTH, HEIGHT))
+player = Player()
         
-def draw(WINDOW):
+def draw():
     # fill window with the darkness
     WINDOW.fill((0,0,0))
-    grid(WINDOW)
+    '''grid()'''
+    pygame.draw.rect(WINDOW, (255,0,0), [player.x-5, player.y-5, 10, 10])
     pygame.display.update() 
 
 def main():
-    # Globalise constants
-    global WIDTH, HEIGHT
-    WIDTH = 800
-    HEIGHT = 600
-    # 4:3 aspect ratio for the vibes
-    WINDOW = pygame.display.set_mode((WIDTH, HEIGHT))
-
+    pygame.init()
     play = True
 
     # main game loop
     while play:
+        pressed_keys = pygame.key.get_pressed()
         for event in pygame.event.get():
+            player.update(pressed_keys)
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
-        # function for drawing grid lines
-        draw(WINDOW)
+        draw()
 
 main()
