@@ -12,6 +12,7 @@ import os
 import sys
 import math
 import pygame
+from pygame.locals import *
 
 class Player:
     # constructor method for the player
@@ -19,29 +20,30 @@ class Player:
         # for now just initialise player position to the centre of the screen
         self.x = WIDTH/2
         self.y = HEIGHT/2
-        self.angle = math.pi
+        self.angle = math.pi # important reminder here
+        self.y_velocity = 0
+        self.x_velocity = 0
 
-    def update(self, keys):
-        if keys[pygame.K_w]:
-            player.y -= 10
-        
-'''
-def grid():
-    line_dist = 40
-    # using DIV here to get the number of vertical and horizontal lines
-    x_lines = WIDTH//line_dist
-    y_lines = HEIGHT//line_dist
-    x = 0
-    y = 0
-    # following for loops draw lines to the screen using some parameters
-    # namely the colour of the line and two points between which the line is drawn
-    for line in range(x_lines):
-        x += line_dist
-        pygame.draw.line(WINDOW, (255,255,255), (x, 0), (x, HEIGHT))
-    for line in range(y_lines):
-        y += line_dist
-        pygame.draw.line(WINDOW, (255,255,255), (0, y), (WIDTH, y))
-'''            
+    def update(self):
+        self.move()
+
+    def move(self):
+        keys = pygame.key.get_pressed()
+        if keys[K_w]:
+            self.y_velocity += 0.25
+        elif keys[K_s]:
+            self.y_velocity -= 0.25
+        else:
+            self.y_velocity *= 0.9
+            
+        if keys[K_a]:
+            self.x_velocity += 0.25
+        elif keys[K_d]:
+            self.x_velocity -= 0.25
+        else:
+            self.x_velocity *= 0.9
+        self.y -= self.y_velocity
+        self.x -= self.x_velocity
 
 # global stuff here
 WIDTH = 800
@@ -52,22 +54,22 @@ player = Player()
 def draw():
     # fill window with the darkness
     WINDOW.fill((0,0,0))
-    '''grid()'''
     pygame.draw.rect(WINDOW, (255,0,0), [player.x-5, player.y-5, 10, 10])
-    pygame.display.update() 
+    pygame.display.flip() 
 
 def main():
-    pygame.init()
+    
+    clock = pygame.time.Clock()
     play = True
 
     # main game loop
     while play:
-        pressed_keys = pygame.key.get_pressed()
+        clock.tick(60)
         for event in pygame.event.get():
-            player.update(pressed_keys)
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
+        player.update()
         draw()
 
 main()
