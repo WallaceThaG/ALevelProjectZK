@@ -17,10 +17,9 @@ from pygame.locals import *
 class Player:
     # constructor method for the player
     def __init__(self):
-        # for now just initialise player position to the centre of the screen
         self.x = WIDTH/2
         self.y = HEIGHT/2
-        self.angle = PI/4
+        self.angle = PI/2
         self.y_velocity = 0
         self.x_velocity = 0
         self.max_vel = 5
@@ -33,63 +32,106 @@ class Player:
     def move(self, keys):
         # vertical movement
         if keys[K_w]:
-            self.y_velocity += 0.35
+            self.x_velocity -= 0.3*math.cos(player.angle)
+            self.y_velocity -= 0.3*math.sin(player.angle)
         elif keys[K_s]:
-            self.y_velocity -= 0.35
-        else:
-            self.y_velocity *= 0.75
-        # limit y velocity
-        if self.y_velocity > self.max_vel:
-            self.y_velocity = self.max_vel
-        elif self.y_velocity < -self.max_vel:
-            self.y_velocity = -self.max_vel
+            self.x_velocity += 0.3*math.cos(player.angle)
+            self.y_velocity += 0.3*math.sin(player.angle)
+        # deceleration
+        elif not(keys[K_a] or keys[K_d]):
+            self.x_velocity *= 0.95
+            self.y_velocity *= 0.95
         # horizontal movement
         if keys[K_a]:
-            self.x_velocity += 0.35
+            self.x_velocity -= 0.3*math.sin(player.angle)
+            self.y_velocity += 0.3*math.cos(player.angle)
         elif keys[K_d]:
-            self.x_velocity -= 0.35
-        else:
-            self.x_velocity *= 0.75
-        # limit x velocity
-        if self.x_velocity > self.max_vel:
-            self.x_velocity = self.max_vel
-        elif self.x_velocity < -self.max_vel:
-            self.x_velocity = -self.max_vel
+            self.x_velocity += 0.3*math.sin(player.angle)
+            self.y_velocity -= 0.3*math.cos(player.angle)
+        # deceleration
+        elif not(keys[K_w] or keys[K_s]):
+            self.x_velocity *= 0.95
+            self.y_velocity *= 0.95
+        
+        # limit velocity
+        self.x_velocity *= 0.96
+        self.y_velocity *= 0.96
+        # update coordinates
         self.y -= self.y_velocity
         self.x -= self.x_velocity
 
     def rotate(self, keys):
+        # decrease player angle when left key is pressed
+        # increase when right key is pressed
         if keys[K_LEFT]:
             self.angle -= 0.1
+            # the player's angle must always be between 0 and 2*pi radians
+            if self.angle < 0:
+                self.angle += 2*PI
         elif keys[K_RIGHT]:
             self.angle += 0.1
+            if self.angle > 2*PI:
+                self.angle -= 2*PI
 
-# global stuff here
-WIDTH = 800
-HEIGHT = 600
-WINDOW = pygame.display.set_mode((WIDTH, HEIGHT))
-PI = math.pi
-player = Player()
-        
 def draw():
     # fill window with the darkness
     WINDOW.fill((0,0,0))
-    pygame.draw.line(WINDOW, (255,0,0), (int(player.x-10*math.sin(player.angle + PI/2)), int(player.y-10*math.sin(player.angle))), (int(player.x+10*math.sin(player.angle + PI/2)), int(player.y+10*math.sin(player.angle))))
-    pygame.display.flip() 
+    draw_player()
+    draw_map()
+    pygame.display.flip()
+
+def draw_player():
+    line_start = (int(player.x), int(player.y))
+    line_end = (int(player.x+15*math.cos(player.angle)), int(player.y+15*math.sin(player.angle)))
+    pygame.draw.line(WINDOW, (255,0,0), line_start, line_end, 3)
+    pygame.draw.circle(WINDOW, (255,0,0), (int(player.x), int(player.y)), 5)
+
+def draw_map():
+    pass
+
+# global stuff here
+WIDTH = 1024
+HEIGHT = 768
+WINDOW = pygame.display.set_mode((WIDTH, HEIGHT))
+PI = math.pi
+player = Player()
+map = ["################",
+       "#     #        #",
+       "#     #        #",
+       "#   ########   #",
+       "#              #",
+       "#              #",
+       "#              #",
+       "#######    #####",
+       "#     #        #",
+       "#     #        #",
+       "#     #        #",
+       "#     #        #",
+       "#              #",
+       "#              #",
+       "#              #",
+       "################",
+]
 
 def main():
+
+    global player
+
+    pygame.init()
     
     clock = pygame.time.Clock()
-    play = True
+    running = True
 
     # main game loop
-    while play:
-        clock.tick(60)
+    while running:
+        clock.tick(60) # targeting 60 fps
         pygame.display.set_caption(str(int(clock.get_fps()))) # keep track of fps
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
+                running = False
                 pygame.quit()
                 sys.exit()
+        # update attributes and draw to the screen
         player.update()
         draw()
 
