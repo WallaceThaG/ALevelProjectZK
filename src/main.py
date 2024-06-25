@@ -73,45 +73,56 @@ class Player:
             if self.angle > 2*PI:
                 self.angle -= 2*PI
 
+    def draw(self):
+        line_start = (int(self.x), int(self.y))
+        line_end = (int(self.x+15*math.cos(self.angle)), int(self.y+15*math.sin(self.angle)))
+        pygame.draw.line(WINDOW, (255,0,0), line_start, line_end, 3)
+        pygame.draw.circle(WINDOW, (255,0,0), (int(self.x), int(self.y)), 5)
+
 def draw():
     # fill window with the darkness
     WINDOW.fill((0,0,0))
-    draw_player()
     draw_map()
+    cast_rays()
+    player.draw()
     pygame.display.flip()
 
-def draw_player():
-    line_start = (int(player.x), int(player.y))
-    line_end = (int(player.x+15*math.cos(player.angle)), int(player.y+15*math.sin(player.angle)))
-    pygame.draw.line(WINDOW, (255,0,0), line_start, line_end, 3)
-    pygame.draw.circle(WINDOW, (255,0,0), (int(player.x), int(player.y)), 5)
-
 def draw_map():
-    pass
+    for i in range(16):
+        for j in range(16):
+            if map_1[i][j] == "#":
+                # draw cells
+                pygame.draw.rect(WINDOW, (0,0,255), pygame.Rect(j*CELL_LENGTH, i*CELL_LENGTH, CELL_LENGTH, CELL_LENGTH))
+
+def cast_rays():
+    line_start = (int(player.x), int(player.y))
+    line_end = (int(player.x+512*math.cos(player.angle)), int(player.y+512*math.sin(player.angle)))
+    pygame.draw.line(WINDOW, (255, 255, 255), line_start, line_end)
 
 # global stuff here
 WIDTH = 1024
 HEIGHT = 768
+CELL_LENGTH = HEIGHT/16
 WINDOW = pygame.display.set_mode((WIDTH, HEIGHT))
 PI = math.pi
 player = Player()
-map = ["################",
-       "#     #        #",
-       "#     #        #",
-       "#   ########   #",
-       "#              #",
-       "#              #",
-       "#              #",
-       "#######    #####",
-       "#     #        #",
-       "#     #        #",
-       "#     #        #",
-       "#     #        #",
-       "#              #",
-       "#              #",
-       "#              #",
-       "################",
-]
+# maps are 16x16 squares with square cells
+map_1 = [  "################",
+           "#     #        #",
+           "#     #        #",
+           "#   ########   #",
+           "#              #",
+           "#              #",
+           "#              #",
+           "#######    #####",
+           "#     #        #",
+           "#     #        #",
+           "#     #        #",
+           "#     #        #",
+           "#              #",
+           "#              #",
+           "#              #",
+           "################",  ]
 
 def main():
 
