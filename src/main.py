@@ -96,8 +96,10 @@ def draw_map():
 
 def cast_rays():
     line_start = (int(player.x), int(player.y))
-    line_end = (int(player.x+512*math.cos(player.angle)), int(player.y+512*math.sin(player.angle)))
-    pygame.draw.line(WINDOW, (255, 255, 255), line_start, line_end)
+    for i in range(-60,60):
+        theta = player.angle+(i*RAY_ANGLE)
+        line_end = (int(player.x+512*math.cos(theta)), int(player.y+512*math.sin(theta)))
+        pygame.draw.line(WINDOW, (255, 255, 255), line_start, line_end)
 
 # global stuff here
 WIDTH = 1024
@@ -105,6 +107,7 @@ HEIGHT = 768
 CELL_LENGTH = HEIGHT/16
 WINDOW = pygame.display.set_mode((WIDTH, HEIGHT))
 PI = math.pi
+RAY_ANGLE = PI/360
 player = Player()
 # maps are 16x16 squares with square cells
 map_1 = [  "################",
